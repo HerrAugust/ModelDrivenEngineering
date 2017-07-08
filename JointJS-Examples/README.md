@@ -9,8 +9,8 @@ This example of JointJS shows:
 
 # Thanks
 It is based on opensource material:
-	* the official one (Joint JS tutorial) http://resources.jointjs.com/tutorial
-	* https://github.com/srikusri/JointJS-Example
+* the official one (Joint JS tutorial) http://resources.jointjs.com/tutorial
+* https://github.com/srikusri/JointJS-Example
 
 # How to launch
 Simply download the repository and launch index.html (or one the other ones) with your browser.
