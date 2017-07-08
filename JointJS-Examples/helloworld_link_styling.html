@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="./joint-master/dist/joint.css" />
+    <script src="./joint-master/node_modules/jquery/dist/jquery.js"></script>
+    <script src="./joint-master/node_modules/lodash/index.js"></script>
+    <script src="./joint-master/node_modules/backbone/backbone.js"></script>
+    <script src="./joint-master/dist/joint.js"></script>
+</head>
+<body>
+  <div id="myholder">
+    <path class="connection"/>
+    <path class="marker-source"/>
+    <path class="marker-target"/>
+    <path class="connection-wrap"/>
+    <g class="labels" />
+    <g class="marker-vertices"/>
+    <g class="marker-arrowheads"/>
+    <g class="link-tools" />
+  </div>
+  <script type="text/javascript">
+
+    var graph = new joint.dia.Graph;
+
+    var paper = new joint.dia.Paper({
+        el: $('#myholder'),
+        width: 600,
+        height: 200,
+        model: graph,
+        gridSize: 1
+    });
+
+    var rect = new joint.shapes.basic.Rect({
+        position: { x: 100, y: 30 },
+        size: { width: 100, height: 30 },
+        attrs: { rect: { fill: 'blue' }, text: { text: 'my box', fill: 'white' } }
+    });
+
+    var rect2 = rect.clone();
+    rect2.translate(300);
+
+    var link = new joint.dia.Link({
+        source: { id: rect.id },
+        target: { id: rect2.id }
+    });
+
+//new code
+    link.attr({
+        '.connection': { stroke: 'blue' },
+        '.marker-source': { fill: 'red', d: 'M 10 0 L 0 5 L 10 10 z' },
+        '.marker-target': { fill: 'yellow', d: 'M 10 0 L 0 5 L 10 10 z' }
+    });
+
+    link.set('smooth', true); // permette di creare di appallottare i link
+    link.set('vertices', [{ x: 300, y: 60 }, { x: 400, y: 60 }, { x: 400, y: 20 }]); // mi aspetterei 2 coordinate. ne sono 3 perchè...esegui il file su browser
+//end new code
+
+    graph.addCells([rect, rect2, link]);
+
+  </script>
+</body>
+</html>
