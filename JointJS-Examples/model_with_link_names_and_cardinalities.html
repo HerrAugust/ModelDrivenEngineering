@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- @author github.com/HerrAugust -->
+    <link rel="stylesheet" href="joint-master/joint.css" />
+
+    <script src="joint-master/jquery.js"></script>
+    <script src="joint-master/index.js"></script>
+    <script src="joint-master/backbone.js"></script>
+    <script src="joint-master/joint.js"></script>
+
+    <script src="joint-master/joint.layout.DirectedGraph.js"></script>
+    <script src="joint-master/graphlib.min.js"></script>
+    <script src="joint-master/dagre.min.js"></script>
+</head>
+<body>
+
+<div id="paper"></div>
+<script type="text/javascript">
+    const UNDIRECTED_ARROW = '';
+    const DIRECTED_ARROW = 'M 4 0 L 0 2 L 4 4 z';
+    const SETOF = 'M 7 0 L 16 7 7 16 0 7 z';
+    const EXTEND = 'M 10 0 L 0 5 L 10 10 z';
+
+    function buildGraphFromAdjacencyList(adjacencyList, arrows) {
+
+        var elements = [];
+        var links = [];
+
+        _.each(adjacencyList, function(edges, parentElementLabel) {
+            elements.push(makeElement(parentElementLabel));
+
+            _.each(edges, function(childElementLabel) {
+                links.push(makeLink(parentElementLabel, childElementLabel, arrows));
+            });
+        });
+
+        // Links must be added after all the elements. This is because when the links
+        // are added to the graph, link source/target
+        // elements must be in the graph already.
+        return elements.concat(links);
+    }
+    function makeLink(parentElementLabel, childElementLabel, arrows) {
+        // First, determine the type of relation between the two element to connect
+        var attr = {}; //bidirectional relation between parent and child, which is correctly the default relation
+        var type = linkType(parentElementLabel, childElementLabel, arrows);
+        var labels = [];
+        //console.log("parent:" + parentElementLabel + "; child: " + childElementLabel + "; type: "+type);
+        if(type == 'extend') {
+            attr = { '.marker-target': { fill: 'white', d: EXTEND } };
+        }
+        else if(type == 'setof') { // Page is a set of contents
+            attr = { '.marker-source': { fill: 'white', d: SETOF } };
+            //console.log('parent:'+parentElementLabel + ' is a set of child:'+childElementLabel);
+            //console.log(arrows.setof[parentElementLabel][childElementLabel]);
+            labels[0] = { position: .85, attrs: { text: { text: arrows.setof[parentElementLabel][childElementLabel] } } };
+        }
+        else if(type == 'relatesTo') { // Link relates to Page (Link points to Page)
+            attr = { '.marker-target': { d: DIRECTED_ARROW }};
+            labels[0] = { position: .5, attrs: { text: { text: arrows.relatesTo[parentElementLabel][childElementLabel][1] } } };
+            labels[1] = { position: .15, attrs: { text: { text: arrows.relatesTo[parentElementLabel][childElementLabel][0] } } };
+        }
+        else if(type == 'bi-relatesTo') {
+            // default choice is good (bidirectional)
+            labels[0] = { position: .5, attrs: { text: { text: arrows.relatesTo[parentElementLabel][childElementLabel][1] } } };
+            labels[1] = { position: .15, attrs: { text: { text: arrows.relatesTo[parentElementLabel][childElementLabel][0] } } };
+            labels[2] = { position: .85, attrs: { text: { text: arrows.relatesTo[childElementLabel][parentElementLabel][0] } } };
+        }
+
+        //And then create the appropriate link
+        var link =  new joint.dia.Link({
+            source: { id: parentElementLabel },
+            target: { id: childElementLabel },
+            attrs: attr,
+            smooth: true
+        });
+
+
+        /*labels: [
+            {position: 0.5, attrs: {text: {text: 'label'}}}
+        ];*/
+        console.log(JSON.stringify(labels));
+        console.log(labels[0])
+        for(var i = 0, len = labels.length; i < len; i++) {
+            link.label(i, labels[i]);
+        }
+
+        return link;
+
+    }
+    /*
+    * Determines the type of a link (i.e., where childElementLabel is found in arrows).
+    * returns {'setof','extend','relatesTo','bi-relatesTo',null}
+    */
+    function linkType(parentElementLabel, childElementLabel, arrows) {
+        //console.log(arrows.setof[parentElementLabel]);
+
+        var arr = arrows.setof[parentElementLabel];
+        if(arrows.setof[parentElementLabel][childElementLabel] != null)
+            return 'setof';
+
+        arr = arrows.relatesTo[parentElementLabel];
+        var parentRelChild = false;
+        if(arr[childElementLabel] != null) {
+            parentRelChild = true;
+        }
+        // I know that parent relates to child. Is also the contrary true?
+        if(parentRelChild) {
+            arr = arrows.relatesTo[childElementLabel];
+            if(arr[parentElementLabel] != null) {
+                return 'bi-relatesTo';
+            }
+        }
+
+        //If the relation between parent and child is not bidirectional, it could be directional. So:
+        if(parentRelChild) {
+            return 'relatesTo';
+        }
+
+        arr = arrows.extend[parentElementLabel];
+        for (var i = 0, len = arr.length; i < len; i++) {
+            if(arr[i] == childElementLabel)
+                return 'extend';
+        }
+
+        return null;
+    }
+
+    function makeElement(label) {
+
+        var maxLineLength = _.max(label.split('\n'), function(l) { return l.length; }).length;
+
+        // Compute width/height of the rectangle based on the number
+        // of lines in the label and the letter size. 0.6 * letterSize is
+        // an approximation of the monospace font letter width.
+        var letterSize = 8;
+        var width = 4 * (letterSize * (0.6 * maxLineLength + 1));
+        var height = 4 * ((label.split('\n').length + 1) * letterSize);
+
+        return new joint.shapes.basic.Rect({
+            id: label,
+            size: { width: width, height: height },
+            attrs: { rect: { fill: '#fff', stroke: '#000', 'stroke-width': 0.5 }, text: { text: label, fill: '#000' } }
+        });
+    }
+//Needed because between 2 entities there could be many arrows
+    function adjustVertices(graph, cell) {
+
+        // If the cell is a view, find its model.
+        cell = cell.model || cell;
+
+        if (cell instanceof joint.dia.Element) {
+
+            _.chain(graph.getConnectedLinks(cell)).groupBy(function(link) {
+                // the key of the group is the model id of the link's source or target, but not our cell id.
+                return _.omit([link.get('source').id, link.get('target').id], cell.id)[0];
+            }).each(function(group, key) {
+                // If the member of the group has both source and target model adjust vertices.
+                if (key !== 'undefined') adjustVertices(graph, _.first(group));
+            });
+
+            return;
+        }
+
+        // The cell is a link. Let's find its source and target models.
+        var srcId = cell.get('source').id || cell.previous('source').id;
+        var trgId = cell.get('target').id || cell.previous('target').id;
+
+        // If one of the ends is not a model, the link has no siblings.
+        if (!srcId || !trgId) return;
+
+        var siblings = _.filter(graph.getLinks(), function(sibling) {
+
+            var _srcId = sibling.get('source').id;
+            var _trgId = sibling.get('target').id;
+
+            return (_srcId === srcId && _trgId === trgId) || (_srcId === trgId && _trgId === srcId);
+        });
+
+        switch (siblings.length) {
+
+            case 0:
+                // The link was removed and had no siblings.
+                break;
+
+            case 1:
+                // There is only one link between the source and target. No vertices needed.
+                cell.unset('vertices');
+                break;
+
+            default:
+
+                // There is more than one siblings. We need to create vertices.
+
+                // First of all we'll find the middle point of the link.
+                var srcCenter = graph.getCell(srcId).getBBox().center();
+                var trgCenter = graph.getCell(trgId).getBBox().center();
+                var midPoint = g.line(srcCenter, trgCenter).midpoint();
+
+                // Then find the angle it forms.
+                var theta = srcCenter.theta(trgCenter);
+
+                // This is the maximum distance between links
+                var gap = 20;
+
+                _.each(siblings, function(sibling, index) {
+
+                    // We want the offset values to be calculated as follows 0, 20, 20, 40, 40, 60, 60 ..
+                    var offset = gap * Math.ceil(index / 2);
+
+                    // Now we need the vertices to be placed at points which are 'offset' pixels distant
+                    // from the first link and forms a perpendicular angle to it. And as index goes up
+                    // alternate left and right.
+                    //
+                    //  ^  odd indexes
+                    //  |
+                    //  |---->  index 0 line (straight line between a source center and a target center.
+                    //  |
+                    //  v  even indexes
+                    var sign = index % 2 ? 1 : -1;
+                    var angle = g.toRad(theta + sign * 90);
+
+                    // We found the vertex.
+                    var vertex = g.point.fromPolar(offset, angle, midPoint);
+
+                    sibling.set('vertices', [{ x: vertex.x, y: vertex.y }]);
+                });
+        }
+    };
+
+
+
+
+
+
+    var graph = new joint.dia.Graph;
+
+    var paper = new joint.dia.Paper({
+        el: $('#paper'),
+        width: 2000,
+        height: 2000,
+        gridSize: 1,
+        model: graph
+    });
+    //Now we have to figure out when to call our function. Vertices need to be adjusted any time user changes the source or
+    // target of a link or he adds/removes one. Additionally we might want to recalculate the vertices when user translates an element.
+    var myAdjustVertices = _.partial(adjustVertices, graph);
+    // adjust vertices when a cell is removed or its source/target was changed
+    graph.on('add remove change:source change:target', myAdjustVertices);
+    // also when an user stops interacting with an element.
+    paper.on('cell:pointerup', myAdjustVertices);
+
+
+    //Until here, standard code
+    var adjacencyList = {
+        'Page' : ['Named', 'Content', 'Link', 'Person'],
+        'Named' : [],
+        'Content' : ['Named'],
+        'Link' : ['Named','Page'],
+        'Person' : ['Named']
+    };
+
+    var setof = {
+        'Page' : {'Content':['1-n'], 'Link':['0-n']},
+        'Named': {},
+        'Content': {},
+        'Link':{},
+        'Person':{}
+    };
+
+    var relatesTo = {
+        'Page': {'Person': ['1','belong']},
+        'Named': {},
+        'Content':{},
+        'Link': {'Page':['1','pointsTo']},
+        'Person': {'Page':['0-n','belong']}
+    };
+
+    var extend = {
+        'Page':['Named'],
+        'Named': [],
+        'Content':['Named'],
+        'Link': ['Named'],
+        'Person': ['Named']
+    };
+
+    var arrows = {'extend':extend, 'relatesTo':relatesTo, 'setof':setof};
+
+    var cells = buildGraphFromAdjacencyList(adjacencyList, arrows);
+    graph.resetCells(cells);
+
+    joint.layout.DirectedGraph.layout(graph, { setLinkVertices: false });
+</script>
+</body>
+</html>
