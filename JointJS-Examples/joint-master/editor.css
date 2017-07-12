@@ -1,0 +1,206 @@
+/* Figures */
+figure {
+    display: block;
+    border: 1px gray;
+    margin: 15px; /* adjust as needed */
+    width: 16px;
+    height: 16px;
+    position: relative;
+}
+figure img {
+    vertical-align: top;
+}
+figure figcaption {
+    position: absolute;
+    margin-left: 30px;
+    bottom: 0;
+}
+
+/* Header */
+header {
+    width: 100%;
+    background: #4f4f4f;
+    height: 40px;
+    top: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
+}
+
+ul {
+    font-family: "Helvetica Neue Light", "Lucida Grande", "Calibri", "Arial", sans-serif;
+   list-style-type: none;
+   margin: 0;
+   padding: 0;
+   overflow: hidden;
+   background-color: #333;
+}
+
+li {
+    float: left;
+}
+
+li a, .dropbtn {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover, .dropdown:hover .dropbtn {
+    background-color: red;
+}
+
+li.dropdown {
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
+
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Aside */
+aside #figures {
+    width: 180px;
+    position: absolute;
+    background: #dddddd;
+    bottom: 0;
+    top: 0;
+    margin-left: 150px;
+    margin-top: 49px;
+    border: 1px solid grey;
+}
+
+aside #properties .header {
+    width: 160px;
+    height: 30px;
+    background: #dddddd;
+    margin-top: 49px;
+    margin-left: -10px;
+    text-align: center;
+    border: 1px solid grey;
+}
+
+/* Footer */
+footer {
+    z-index: 10;
+    height: 30px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: #ffffff;
+    background: #4f4f4f;
+    text-align: center;
+    margin-top: 5px;
+    font-family: "Helvetica Neue Light", "Lucida Grande", "Calibri", "Arial", sans-serif;
+}
+
+/* content */
+#paper {
+    margin-left: 345px;
+}
+
+/* Arrows */
+/* empty rhombus */
+.setof {
+    d: 'M 30 0 L 60 30 30 60 0 30 z';
+    fill: #fff;
+}
+.aggregation {
+    d: 'M 30 0 L 60 30 30 60 0 30 z';
+    fill: #000;
+}
+.arrow {
+    fill: #fff;
+}
+
+/* Needed for customized elements */
+#paper-html-elements {
+    position: relative;
+    display: inline-block;
+    background: transparent;
+    overflow: hidden;
+}
+#paper-html-elements svg {
+    background: transparent;
+}
+#paper-html-elements svg .link {
+    z-index: 2;
+}
+.html-element {
+    position: absolute;
+    /* Make sure events are propagated to the JointJS element so, e.g. dragging works.*/
+    pointer-events: none;
+    -webkit-user-select: none;
+    border-radius: 4px;
+    padding: 5px;
+    box-sizing: border-box;
+    z-index: 2;
+}
+.html-element input {
+    /* Enable interacting with inputs only. */
+    pointer-events: auto;
+
+    color: #000000;
+    border: none;
+    width: 90%;
+    text-align: center;
+}
+.html-element textarea {
+    /* Enable interacting with inputs only. */
+    pointer-events: auto;
+
+    position: absolute;
+    width: 90%;
+    height: 47%;
+    right: 2px;
+    color: #000000;
+    font-size: 9px;
+    border-color: transparent;
+    resize: none;
+}
+label.small {
+    font-size: 9px;
+}
+hr {
+    background-image: linear-gradient(to right, #ccc, #333, #ccc);
+    width: 90%;
+}
+text tspan {
+    transform: translate(295px, 115px);
+}
+.move {
+    /* Enable interacting with inputs only. */
+    pointer-events: auto;
+
+    background-color: white;
+    border: 1px solid #000000;
+    width: 5px;
+    height: 5px;
+    position: absolute;
+    cursor: nw-resize;
+    bottom: -2px;
+    right: -2px;
+    visibility: hidden;
+}
