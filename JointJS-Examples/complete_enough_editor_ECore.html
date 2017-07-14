@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="ISO-8859-1"/>
     <!-- @author github.com/HerrAugust -->
-    <link rel="stylesheet" href="joint-master/joint.css" />
-    <link rel="stylesheet" href="joint-master/custom/editor.css"/>
+    <link rel="stylesheet" href="./joint-master/joint.css" />
+    <link rel="stylesheet" href="joint-master/custom/css/all.css"/>
 
-    <script src="joint-master/jquery.js"></script>
-    <script src="joint-master/index.js"></script>
-    <script src="joint-master/backbone.js"></script>
-    <script src="joint-master/joint.js"></script>
+    <script src="./joint-master/jquery.js"></script>
+    <script src="./joint-master/index.js"></script>
+    <script src="./joint-master/backbone.js"></script>
+    <script src="./joint-master/joint.js"></script>
 
     <script src="joint-master/joint.layout.DirectedGraph.js"></script>
     <script src="joint-master/graphlib.min.js"></script>
     <script src="joint-master/dagre.min.js"></script>
+
+
 </head>
 <body>
 
@@ -38,39 +41,80 @@
 
 <aside>
     <div id="figures">
-        <figure>
-            <img src="joint-master/custom/images/EPackage.png" alt="EPackage">
-            <figcaption>EPackage</figcaption>
-        </figure>
-        <figure>
-            <figcaption>Entity</figcaption>
-            <img src="joint-master/custom/images/EClass.png" alt="Entity">
-        </figure>
-        <figure>
-            <img src="joint-master/custom/images/EDataType.png" alt="EDataType">
-            <figcaption>EDataType</figcaption>
-        </figure>
-        <figure>
-            <img src="joint-master/custom/images/EEnum.png" alt="EEnum">
-            <figcaption>EEnum</figcaption>
-        </figure>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/EPackage.png" alt="EPackage">
+                <figcaption>EPackage</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/EClass.png" alt="Entity">
+                <figcaption>Entity</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/EDataType.png" alt="EDataType">
+                <figcaption>EDataType</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/EEnum.png" alt="EEnum">
+                <figcaption>EEnum</figcaption>
+            </figure>
+        </div>
         <hr/>
-        <figure>
-            <img src="joint-master/custom/images/association.png" alt="Undirected arrow">
-            <figcaption>Association</figcaption>
-        </figure>
-        <figure>
-            <img src="joint-master/custom/images/EReference.png" alt="EReference">
-            <figcaption>EReference</figcaption>
-        </figure>
-        <figure>
-            <img src="joint-master/custom/images/aggregation.png" alt="Aggregation">
-            <figcaption>Aggregation</figcaption>
-        </figure>
-        <figure>
-            <img src="joint-master/custom/images/ESuperType.png" alt="ESuperType">
-            <figcaption>ESuperType</figcaption>
-        </figure>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/association.png" alt="Undirected arrow">
+                <figcaption>Association</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/EReference.png" alt="EReference">
+                <figcaption>EReference</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/aggregation.png" alt="Aggregation">
+                <figcaption>Aggregation</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/ESuperType.png" alt="ESuperType">
+                <figcaption>ESuperType</figcaption>
+            </figure>
+        </div>
+        <hr/>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/circle.png"/>
+                <figcaption>Circle</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/ellipse.png"/>
+                <figcaption>Ellipse</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/rectangle.png"/>
+                <figcaption>Rectangle</figcaption>
+            </figure>
+        </div>
+        <!--<div class="figure-container"> not working well
+            <figure>
+                <img src="joint-master/custom/images/rombo.png"/>
+                <figcaption>Diamond</figcaption>
+            </figure>
+        </div>-->
     </div>
 
     <div id="properties">
@@ -107,6 +151,13 @@
     Ecore diagrams editor
 </footer>
 
+<script type="text/javascript" src="joint-master/custom/shapes/utility.js"></script>
+<script type="text/javascript" src="joint-master/custom/shapes/RoundedRectangle.js"></script>
+<script type="text/javascript" src="joint-master/custom/shapes/rectangle.js"></script>
+<script type="text/javascript" src="joint-master/custom/shapes/ellipse.js"></script>
+<script type="text/javascript" src="joint-master/custom/shapes/circle.js"></script>
+<!--<script type="text/javascript" src="joint-master/custom/shapes/diamond.js"></script> not working well-->
+
 <script type="text/javascript">
     const UNDIRECTED_ARROW = '';
     const DIRECTED_ARROW = 'M 4 0 L 0 2 L 4 4 z';
@@ -117,6 +168,37 @@
 
     //Needed when dragging a rectangle (box)
     var startX, startY, startWidth, startHeight;
+
+    /* BEGIN Non JointJS functionalities */
+    $('.figure-container').click(function(e) {
+        $('.figure-container').each(function(e) {
+            $(this).removeClass('figure-container-clicked');
+        });
+        var figcap = $(this).first().find('figcaption').text();
+        var newelem;
+        if(figcap == 'Association' || figcap == 'EReference' || figcap == 'Aggregation' || figcap == 'ESuperType') {
+            $(this).addClass('figure-container-clicked');
+        }
+        else { //Rectangles clicked
+            // Create a new object and position it on a standard position
+            switch(figcap) {
+                case 'Circle':
+                    newelem = new joint.shapes.html.circle.Circle();
+                    break;
+                case 'Ellipse':
+                    newelem = new joint.shapes.html.ellipse.Ellipse();
+                    break;
+                case 'Rectangle':
+                    newelem = new joint.shapes.html.rectangle.Rectangle();
+                    break;
+                /*case 'Diamond':
+                    newelem = new joint.shapes.html.diamond.Diamond();
+                    break;*/
+            }
+            graph.addCell(newelem);
+        }
+    });
+    /* END Non JointJS functionalities */
 
     function buildGraphFromAdjacencyList(adjacencyList, arrows, attributes) {
 
@@ -130,6 +212,16 @@
                 links.push(makeLink(parentElementLabel, childElementLabel, arrows));
             });
         });
+
+        /*var ellipse = new joint.shapes.html.ellipse.Ellipse({
+            id: 'label_ellipse',
+            size: { width: 200, height: 100 },
+        });
+        elements.push(ellipse);*/
+        /*var circle = new joint.shapes.html.circle.Circle({
+            id: 'label_circle'
+        })
+        elements.push(circle);*/
 
         // Links must be added after all the elements. This is because when the links
         // are added to the graph, link source/target
@@ -199,256 +291,24 @@
 
         //console.log('label='+label);
 
-
         // Create JointJS elements and add them to the graph as usual.
-        var elem = new joint.shapes.html.Element({
+        var elem = new joint.shapes.html.roundedrectangle.RoundedRectangle({
             id: label,
             size: { width: width, height: height },
-            attrs: { rect: { fill: '#fff', stroke: '#000', 'stroke-width': 0.5 }/*, text: { text: label, fill: '#000' }*/ }
+            attrs: { rect: { fill: '#fff', stroke: '#000', 'stroke-width': 0.5 } }
         });
         
         console.log(elem)
         elem.attr('text/ref-y','0.2');
-        elem.attr("rect/rx", "10");
-        elem.attr("rect/ry", "10");
 
         return elem;
     }
-    /*
-    * Determines the type of a link (i.e., where childElementLabel is found in arrows).
-    * returns {'setof','extend','relatesTo','bi-relatesTo',null}
-    */
-    function linkType(parentElementLabel, childElementLabel, arrows) {
-        //console.log(arrows.setof[parentElementLabel]);
 
-        var arr = arrows.setof[parentElementLabel];
-        if(arrows.setof[parentElementLabel][childElementLabel] != null)
-            return 'setof';
-
-        arr = arrows.relatesTo[parentElementLabel];
-        var parentRelChild = false;
-        if(arr[childElementLabel] != null) {
-            parentRelChild = true;
-        }
-        // I know that parent relates to child. Is also the contrary true?
-        if(parentRelChild) {
-            arr = arrows.relatesTo[childElementLabel];
-            if(arr[parentElementLabel] != null) {
-                return 'bi-relatesTo';
-            }
-        }
-
-        //If the relation between parent and child is not bidirectional, it could be directional. So:
-        if(parentRelChild) {
-            return 'relatesTo';
-        }
-
-        arr = arrows.extend[parentElementLabel];
-        for (var i = 0, len = arr.length; i < len; i++) {
-            if(arr[i] == childElementLabel)
-                return 'extend';
-        }
-
-        return null;
-    }
-//Needed because between 2 entities there could be many arrows
-    function adjustVertices(graph, cell) {
-
-        // If the cell is a view, find its model.
-        cell = cell.model || cell;
-
-        if (cell instanceof joint.dia.Element) {
-
-            _.chain(graph.getConnectedLinks(cell)).groupBy(function(link) {
-                // the key of the group is the model id of the link's source or target, but not our cell id.
-                return _.omit([link.get('source').id, link.get('target').id], cell.id)[0];
-            }).each(function(group, key) {
-                // If the member of the group has both source and target model adjust vertices.
-                if (key !== 'undefined') adjustVertices(graph, _.first(group));
-            });
-
-            return;
-        }
-
-        // The cell is a link. Let's find its source and target models.
-        var srcId = cell.get('source').id || cell.previous('source').id;
-        var trgId = cell.get('target').id || cell.previous('target').id;
-
-        // If one of the ends is not a model, the link has no siblings.
-        if (!srcId || !trgId) return;
-
-        var siblings = _.filter(graph.getLinks(), function(sibling) {
-
-            var _srcId = sibling.get('source').id;
-            var _trgId = sibling.get('target').id;
-
-            return (_srcId === srcId && _trgId === trgId) || (_srcId === trgId && _trgId === srcId);
-        });
-
-        switch (siblings.length) {
-
-            case 0:
-                // The link was removed and had no siblings.
-                break;
-
-            case 1:
-                // There is only one link between the source and target. No vertices needed.
-                cell.unset('vertices');
-                break;
-
-            default:
-
-                // There is more than one siblings. We need to create vertices.
-
-                // First of all we'll find the middle point of the link.
-                var srcCenter = graph.getCell(srcId).getBBox().center();
-                var trgCenter = graph.getCell(trgId).getBBox().center();
-                var midPoint = g.line(srcCenter, trgCenter).midpoint();
-
-                // Then find the angle it forms.
-                var theta = srcCenter.theta(trgCenter);
-
-                // This is the maximum distance between links
-                var gap = 20;
-
-                _.each(siblings, function(sibling, index) {
-
-                    // We want the offset values to be calculated as follows 0, 20, 20, 40, 40, 60, 60 ..
-                    var offset = gap * Math.ceil(index / 2);
-
-                    // Now we need the vertices to be placed at points which are 'offset' pixels distant
-                    // from the first link and forms a perpendicular angle to it. And as index goes up
-                    // alternate left and right.
-                    //
-                    //  ^  odd indexes
-                    //  |
-                    //  |---->  index 0 line (straight line between a source center and a target center.
-                    //  |
-                    //  v  even indexes
-                    var sign = index % 2 ? 1 : -1;
-                    var angle = g.toRad(theta + sign * 90);
-
-                    // We found the vertex.
-                    var vertex = g.point.fromPolar(offset, angle, midPoint);
-
-                    sibling.set('vertices', [{ x: vertex.x, y: vertex.y }]);
-                });
-        }
-    };
-    //This is the shape for boxes:
-    // Create a custom element. See http://resources.jointjs.com/tutorial/html-elements
-    joint.shapes.html = {};
-    joint.shapes.html.Element = joint.shapes.basic.Rect.extend({
-        defaults: joint.util.deepSupplement({
-            type: 'html.Element',
-            attrs: {
-                rect: { stroke: 'none', 'fill-opacity': 0 }
-            }
-        }, joint.shapes.basic.Rect.prototype.defaults)
-    });
-    // Create a custom view for that element that displays an HTML div above it.
-    joint.shapes.html.ElementView = joint.dia.ElementView.extend({
-        template: [
-            '<div class="html-element">',
-                '<input type="text" value="" placeholder="Entity name"/>',
-                '<div class="move"></div>',
-                '<br/>',
-                '<hr/>',
-                '<textarea rows="1" name="attributes" value="" placeholder="no attributes and functions"></textarea>',
-            '</div>'
-        ].join(''),
-
-        initialize: function() {
-            var model = null;
-            _.bindAll(this, 'updateBox');
-            joint.dia.ElementView.prototype.initialize.apply(this, arguments);
-            this.$box = $(_.template(this.template)());
-
-            // Prevent paper from handling pointerdown.
-            this.$box.find('input, textarea').on('mousedown click', function(evt) {
-                evt.stopPropagation();
-            });
-
-            // Set ID to textarea and input so that programmers can work with them
-            var txtarea = this.$box.find('textarea').attr('id',"txtarea_"+textareaid);
-            txtarea.val(getAttrs_Functs(entities[textareaid]));
-            var input = this.$box.find('input').attr('id',"input_"+textareaid);
-            input.val(entities[textareaid]);
-            textareaid++;
-
-            // On click, show resize button on the bottom-right corner of the clicked box
-            paper.on('cell:pointerclick', function(cellView, evt, x, y) {
-                evt.preventDefault();
-                $('.move').each(function(index) {
-                    $(this).css('visibility', 'hidden');
-                });
-                cellView.$box.find('.move').css('visibility', 'visible');
-            });
-
-            // BEGIN Handling dragging for box resizing
-            this.$box.find('.move').on('mousedown', _.bind(function(evt) {
-                //get this element's rect
-                var bbox = this.model.getBBox();
-                startWidth = bbox.width;
-                startHeight = bbox.height;
-                startX = bbox.x + parseFloat($('#paper').css('margin-left'),10) + startWidth;
-                startY = bbox.y + parseFloat($('#paper').css('margin-top'),10) + startHeight;
-                document.documentElement.addEventListener('mousemove', doDrag, false);
-                document.documentElement.addEventListener('mouseup', stopDrag, false);
-
-                model = this.model;
-            }, this));
-
-            function doDrag(e) {
-                var newwidth =  startWidth + e.clientX - startX;
-                var newheight = startHeight + e.clientY - startY;
-                /*console.log('sw '+startWidth)
-                console.log('x: '+e.clientX)
-                console.log('startx: ' +startX)
-                console.log('newwidth: ' +newwidth)*/
-                model.resize(newwidth, newheight);
-            }
-
-            function stopDrag(e) {
-                document.documentElement.removeEventListener('mousemove', doDrag, false);
-                document.documentElement.removeEventListener('mouseup', stopDrag, false);
-            }
-            // END Handling dragging for box resizing
-
-            // Update the box position whenever the underlying model changes.
-            this.model.on('change', this.updateBox, this);
-            // Remove the box when the model gets removed from the graph.
-            this.model.on('remove', this.removeBox, this);
-
-            this.updateBox();
-        },
-        render: function() {
-            joint.dia.ElementView.prototype.render.apply(this, arguments);
-            this.paper.$el.prepend(this.$box);
-            this.updateBox();
-            return this;
-        },
-        updateBox: function() {
-            // Set the position and dimension of the box so that it covers the JointJS element.
-            var bbox = this.model.getBBox();
-            // Example of updating the HTML with a data stored in the cell model.
-            //this.$box.find('label').text(this.model.get('label'));
-            //this.$box.find('span').text(this.model.get('select'));
-            this.$box.css({
-                width: bbox.width,
-                height: bbox.height,
-                left: bbox.x,
-                top: bbox.y,
-                transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg)'
-            });
-        },
-        removeBox: function(evt) {
-            this.$box.remove();
-        }
-    });
     //Returns a string containing all attributes and functions of an entity
     function getAttrs_Functs(entityname) {
         var attrs = attributes[entityname];
+        if(attrs == undefined)
+            return '';
         var res = '';
         for(var i = 0, len = attrs.length; i < len; i++) {
             var name = attrs[i][0];
@@ -458,7 +318,6 @@
         }
         return res;
     }
-
 
 
 
