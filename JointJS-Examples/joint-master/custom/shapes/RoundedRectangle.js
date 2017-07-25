@@ -9,9 +9,9 @@ joint.shapes.html.roundedrectangle = {};
 joint.shapes.html.roundedrectangle.RoundedRectangle = joint.shapes.basic.Rect.extend({
     defaults: joint.util.deepSupplement({
         type: 'html.Element',
-        size: { width: 100, height: 100 },
+        size: { width: 130, height: 100 },
         attrs: {
-            rect: { rx: 15, ry: 15, stroke: '#000', 'fill-opacity': 1 }
+            rect: { rx: 5, ry: 5, stroke: '#000', 'fill-opacity': 1 }, text: { 'fill-opacity': 0.0 }
         }
     }, joint.shapes.basic.Rect.prototype.defaults)
 });
@@ -19,8 +19,10 @@ joint.shapes.html.roundedrectangle.RoundedRectangle = joint.shapes.basic.Rect.ex
 joint.shapes.html.ElementView = joint.dia.ElementView.extend({
     template: [
         '<div class="html-element">',
+            '<label></label>',
             '<input type="text" value="" placeholder="Entity name"/>',
             '<div class="move"></div>',
+            '<div class="delete">x</div>',
             '<br/>',
             '<hr/>',
             '<textarea rows="1" name="attributes" value="" placeholder="no attributes and functions"></textarea>',
@@ -38,11 +40,23 @@ joint.shapes.html.ElementView = joint.dia.ElementView.extend({
             evt.stopPropagation();
         });
 
+        this.model.attr('text/text', textareaid.toString())
+
         // Set ID to textarea and input so that programmers can work with them
-        var txtarea = this.$box.find('textarea').attr('id',"txtarea_"+textareaid);
-        txtarea.val(getAttrs_Functs(entities[textareaid]));
-        var input = this.$box.find('input').attr('id',"input_"+textareaid);
-        input.val(entities[textareaid]);
+        if(eenums[this.model.get('id')] != undefined) {
+            var txtarea = this.$box.find('textarea').attr('id', "txtarea_" + textareaid);
+            var eliterals = eenums[this.model.get('id')].join();
+            txtarea.val(eliterals);
+            var input = this.$box.find('input').attr('id', "input_" + textareaid);
+            input.val(this.model.get('id'));
+            this.$box.find('input').parent().children().first().text("<<EEnum>>");
+        }
+        else {
+            var txtarea = this.$box.find('textarea').attr('id', "txtarea_" + textareaid);
+            txtarea.val(getAttrs_Functs(entities[textareaid]));
+            var input = this.$box.find('input').attr('id', "input_" + textareaid);
+            input.val(entities[textareaid]);
+        }
         textareaid++;
 
         // On click, show resize button on the bottom-right corner of the clicked box
@@ -52,7 +66,18 @@ joint.shapes.html.ElementView = joint.dia.ElementView.extend({
                 $(this).css('visibility', 'hidden');
             });
             cellView.$box.find('.move').css('visibility', 'visible');
+            $('.delete').each(function(index) {
+                $(this).css('visibility', 'hidden');
+            });
+            cellView.$box.find('.delete').css('visibility', 'visible');
         });
+
+        // Handling "x" click
+        this.$box.find('.delete').on('mousedown', _.bind(function(evt) {
+            if(confirm('Delete '+this.$box.find('input').val() + '?')) {
+                this.removeBox(evt);
+            }
+        }, this));
 
         // BEGIN Handling dragging for box resizing
         this.$box.find('.move').on('mousedown', _.bind(function(evt) {
@@ -112,6 +137,9 @@ joint.shapes.html.ElementView = joint.dia.ElementView.extend({
         });
     },
     removeBox: function(evt) {
+        graph.removeLinks(this.model);
+
         this.$box.remove();
+        this.remove();
     }
 });

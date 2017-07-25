@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="ISO-8859-1"/>
+    <!-- @author github.com/HerrAugust -->
+    <link rel="stylesheet" href="joint-master/custom/css/normalize.css" />
+    <link rel="stylesheet" href="joint-master/joint.css" />
+    <link rel="stylesheet" href="joint-master/custom/css/all.css"/>
+
+    <script src="joint-master/jquery.js"></script>
+    <script src="joint-master/index.js"></script>
+    <script src="joint-master/backbone.js"></script>
+    <script src="joint-master/joint.js"></script>
+
+    <script src="joint-master/joint.layout.DirectedGraph.js"></script>
+    <script src="joint-master/graphlib.min.js"></script>
+    <script src="joint-master/dagre.min.js"></script>
+
+</head>
+<body>
+
+<header>
+    <ul>
+        <li class="dropdown">
+            <a href="javascript:void(0)" class="dropbtn">Help</a>
+            <div class="dropdown-content">
+                <a href="http://www.mdeforge.org/">About</a>
+                <a href="mailto:mde@univaq.it">Feedback</a>
+            </div>
+        </li>
+        <li class="dropdown">
+            <a href="javascript:void(0)" class="dropbtn">Change user</a>
+            <div class="dropdown-content"id="a_changeUser">
+                <a href="#" id="a_superUser">Super user</a>
+                <a href="#" id="a_user" class="active">User</a>
+            </div>
+        </li>
+    </ul>
+</header>
+
+<aside>
+    <div id="figures">
+       <!-- <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/EPackage.png" alt="EPackage">
+                <figcaption>EPackage</figcaption>
+            </figure>
+        </div>-->
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/EClass.png" alt="Entity">
+                <figcaption>Entity</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/EDataType.png" alt="EDataType">
+                <figcaption>EDataType</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/EEnum.png" alt="EEnum">
+                <figcaption>EEnum</figcaption>
+            </figure>
+        </div>
+        <hr/>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/association.png" alt="Undirected arrow">
+                <figcaption>Association</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/EReference.png" alt="EReference">
+                <figcaption>EReference</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/aggregation.png" alt="Aggregation">
+                <figcaption>Aggregation</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/ESuperType.png" alt="ESuperType">
+                <figcaption>ESuperType</figcaption>
+            </figure>
+        </div>
+        <hr/>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/circle.png"/>
+                <figcaption>Circle</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/ellipse.png"/>
+                <figcaption>Ellipse</figcaption>
+            </figure>
+        </div>
+        <div class="figure-container">
+            <figure>
+                <img src="joint-master/custom/images/rectangle.png"/>
+                <figcaption>Rectangle</figcaption>
+            </figure>
+        </div>
+        <!--<div class="figure-container"> not working well
+            <figure>
+                <img src="joint-master/custom/images/rombo.png"/>
+                <figcaption>Diamond</figcaption>
+            </figure>
+        </div>-->
+    </div>
+</aside>
+
+<div id="paper"></div>
+
+<footer>
+    Ecore diagrams editor
+</footer>
+<script type="text/javascript" src="joint-master/custom/aside_management.js"></script>
+<script type="text/javascript" src="joint-master/custom/topbar_management.js"></script>
+<script type="text/javascript" src="joint-master/custom/shapes/utility.js"></script>
+
+<script type="text/javascript" src="joint-master/custom/shapes/RoundedRectangle.js"></script>
+<script type="text/javascript" src="joint-master/custom/shapes/rectangle.js"></script>
+<script type="text/javascript" src="joint-master/custom/shapes/ellipse.js"></script>
+<script type="text/javascript" src="joint-master/custom/shapes/circle.js"></script>
+<!--<script type="text/javascript" src="joint-master/custom/shapes/diamond.js"></script> not working well-->
+
+<script type="text/javascript">
+    const UNDIRECTED_ARROW = '';
+    const DIRECTED_ARROW = 'M 4 0 L 0 2 L 4 4 z';
+    const SETOF = 'M 7 0 L 16 7 7 14 0 7 z';
+    const EXTEND = 'M 10 0 L 0 5 L 10 10 z';
+
+    var textareaid = 0;
+    var enum_number = 0;
+
+    //Needed when dragging a rectangle (box)
+    var startX, startY, startWidth, startHeight;
+
+    var shape = "roundedrectangle";
+
+    function buildGraphFromAdjacencyList(adjacencyList, arrows, attributes, shape) {
+
+        var elements = [];
+        var links = [];
+
+        _.each(adjacencyList, function(edges, parentElementLabel) {
+            elements.push(makeElement(parentElementLabel, shape));
+
+            _.each(edges, function(childElementLabel) {
+                links.push(makeLink(parentElementLabel, childElementLabel, arrows));
+            });
+        });
+
+        /*var ellipse = new joint.shapes.html.ellipse.Ellipse({
+         id: 'label_ellipse',
+         size: { width: 200, height: 100 },
+         });
+         elements.push(ellipse);*/
+        /*var circle = new joint.shapes.html.circle.Circle({
+         id: 'label_circle'
+         })
+         elements.push(circle);*/
+
+        // Links must be added after all the elements. This is because when the links
+        // are added to the graph, link source/target
+        // elements must be in the graph already.
+        return elements.concat(links);
+    }
+
+    function makeEEnum(label, shape) {
+        var maxLineLength = _.max(label.split('\n'), function(l) { return l.length; }).length;
+        // Compute width/height of the rectangle based on the number
+        // of lines in the label and the letter size. 0.6 * letterSize is
+        // an approximation of the monospace font letter width.
+        var letterSize = 8;
+        var width = 4 * (letterSize * (0.6 * maxLineLength + 1));
+        var height = 4 * ((label.split('\n').length + 1) * letterSize) + 35;
+
+        //console.log(label)
+        var defaultValuesEenum = {
+            id: label,
+            position: { x: 0, y: 120*enum_number + 60 },
+            size: {width: width, height: height},
+            attrs: { rect: { fill: '#fff', stroke: '#000', 'stroke-width': 0.5 }, text: { 'fill-opacity': 0.0 } }
+        }
+        var elem = null;
+        switch (shape){
+            case "roundedrectangle":
+                elem = new joint.shapes.html.roundedrectangle.RoundedRectangle(defaultValuesEenum);
+                break;
+            case "circle":
+                elem = new joint.shapes.html.circle.Circle(defaultValuesEenum);
+                break;
+            case "rectangle":
+                elem = new joint.shapes.html.rectangle.Rectangle(defaultValuesEenum);
+                break;
+            case "ellipse":
+                elem = new joint.shapes.html.ellipse.Ellipse(defaultValuesEenum);
+                break;
+            default:
+                console.log("forma non trovata");
+                elem = null;
+        }
+
+        elem.attr('text/ref-y','0.2');
+        enum_number++;
+
+        return elem;
+    }
+    function makeLink(parentElementLabel, childElementLabel, arrows, typology = '') {
+        // First, determine the type of relation between the two element to connect
+        var attr = {}; //bidirectional relation between parent and child, which is correctly the default relation
+        var type = linkType(parentElementLabel, childElementLabel, arrows);
+        if(type === null)
+            type = typology;
+        var labels = [];
+        //console.log("parent:" + parentElementLabel + "; child: " + childElementLabel + "; type: "+type);
+        if(type == 'extend') {
+            attr = { '.marker-target': { fill: 'white', d: EXTEND } };
+        }
+        else if(type == 'setof') { // Page is a set of contents
+            attr = { '.marker-source': { fill: 'white', d: SETOF } };
+            //console.log('parent:'+parentElementLabel + ' is a set of child:'+childElementLabel);
+            //console.log(arrows.setof[parentElementLabel][childElementLabel]);
+            labels[0] = { position: .85, attrs: { text: { text: arrows.setof[parentElementLabel][childElementLabel] } } };
+        }
+        else if(type == 'relatesTo') { // Link relates to Page (Link points to Page)
+            attr = { '.marker-target': { d: DIRECTED_ARROW }};
+            labels[0] = { position: .5, attrs: { text: { text: arrows.relatesTo[parentElementLabel][childElementLabel][1] } } };
+            labels[1] = { position: .15, attrs: { text: { text: arrows.relatesTo[parentElementLabel][childElementLabel][0] } } };
+        }
+        else if(type == 'bi-relatesTo') {
+            // default choice is good (bidirectional)
+            labels[0] = { position: .5, attrs: { text: { text: arrows.relatesTo[parentElementLabel][childElementLabel][1] } } };
+            labels[1] = { position: .15, attrs: { text: { text: arrows.relatesTo[parentElementLabel][childElementLabel][0] } } };
+            labels[2] = { position: .85, attrs: { text: { text: arrows.relatesTo[childElementLabel][parentElementLabel][0] } } };
+        }
+
+        //And then create the appropriate link
+        var link =  new joint.dia.Link({
+            source: { id: parentElementLabel },
+            target: { id: childElementLabel },
+            attrs: attr,
+            // You can choose the one that you want from http://resources.jointjs.com/demos/routing
+            router: { name: 'orthogonal' },
+            connector: { name: 'jumpover' },
+            smooth: true
+        });
+
+
+        /*labels: [
+         {position: 0.5, attrs: {text: {text: 'label'}}}
+         ];*/
+        //console.log(JSON.stringify(labels));
+        //console.log(labels[0])
+        for(var i = 0, len = labels.length; i < len; i++) {
+            link.label(i, labels[i]);
+        }
+
+        return link;
+
+    }
+    function makeElement(label, shape) {
+        var elem = null;
+        var maxLineLength = _.max(label.split('\n'), function(l) { return l.length; }).length;
+
+        // Compute width/height of the rectangle based on the number
+        // of lines in the label and the letter size. 0.6 * letterSize is
+        // an approximation of the monospace font letter width.
+        var letterSize = 8;
+        var width = 4 * (letterSize * (0.6 * maxLineLength + 1));
+        var height = 4 * ((label.split('\n').length + 1) * letterSize) + 35;
+
+        //console.log('label='+label);
+        var defaultValuesElem = {
+            id: label,
+            size: {width: width, height: height},
+            attrs: { rect: { fill: '#fff', stroke: '#000', 'stroke-width': 0.5 }, text: { 'fill-opacity': 0.0 } }
+        }
+        // Create JointJS elements and add them to the graph as usual.
+        switch (shape){
+            case "roundedrectangle":
+                elem = new joint.shapes.html.roundedrectangle.RoundedRectangle(defaultValuesElem);
+                break;
+            case "circle":
+                elem = new joint.shapes.html.circle.Circle(defaultValuesElem);
+                break;
+            case "rectangle":
+                elem = new joint.shapes.html.rectangle.Rectangle(defaultValuesElem);
+                break;
+            case "ellipse":
+                elem = new joint.shapes.html.ellipse.Ellipse(defaultValuesElem);
+                break;
+            default:
+                console.log("shape non found");
+                return;
+        }
+
+
+        //console.log(elem)
+        elem.attr('text/ref-y', '0.2');
+
+        return elem;
+    }
+
+    //Returns a string containing all attributes and functions of an entity
+    function getAttrs_Functs(entityname) {
+        var attrs = attributes[entityname];
+        if(attrs == undefined)
+            return '';
+        var res = '';
+        for(var i = 0, len = attrs.length; i < len; i++) {
+            var name = attrs[i][0];
+            var card = attrs[i][2];
+            var type = attrs[i][1];
+            res += name + ' : ' + type + ' ' + '[' + card + ']\n';
+        }
+        return res;
+    }
+
+
+
+
+    var graph = new joint.dia.Graph;
+
+    var paper = new joint.dia.Paper({
+        el: $('#paper'),
+        width: 2000,
+        height: 2000,
+        gridSize: 1,
+        model: graph
+    });
+    //Now we have to figure out when to call our function. Vertices need to be adjusted any time user changes the source or
+    // target of a link or he adds/removes one. Additionally we might want to recalculate the vertices when user translates an element.
+    var myAdjustVertices = _.partial(adjustVertices, graph);
+    // adjust vertices when a cell is removed or its source/target was changed
+    graph.on('add remove change:source change:target', myAdjustVertices);
+    // also when an user stops interacting with an element.
+    paper.on('cell:pointerup', myAdjustVertices);
+    // when you click where there is no link or cell, just hide cell's buttons
+    paper.on('blank:pointerclick', function(evt, x, y) {
+        $('.move').each(function() {
+            $(this).css('visibility', 'hidden');
+        });
+        $('.delete').each(function() {
+            $(this).css('visibility', 'hidden')
+        });
+    });
+    paper.on('cell:pointerclick', aside_linkCreation);
+    //paper.on('cell:mouseover', aside_cellMouseOver);
+    //paper.on('cell:mouseout', aside_cellMouseOut);
+
+    var entities = ['Named', 'Page', 'Content', 'Person', 'Link', 'Website'];
+
+    var adjacencyList = {
+        'Named' : [  ],
+        'Page' : [ 'Named', 'Link', 'Content', 'Person' ],
+        'Content' : [ 'Named' ],
+        'Person' : [ 'Named', 'Page' ],
+        'Link' : [ 'Named', 'Page' ],
+        'Website' : [ 'Named', 'Page', 'Person' ]
+    };
+
+    var setof = {
+        'Named' : {  },
+        'Page' : { 'links': ['0-n'], 'content': ['1-n'] },
+        'Content' : {  },
+        'Person' : {  },
+        'Link' : {  },
+        'Website' : { 'pages': ['1-n'], 'people': ['1-n'] }
+    };
+
+    var relatesTo = {
+        'Named' : {  },
+        'Page' : { 'Person': ['1','belongs'] },
+        'Content' : {  },
+        'Person' : { 'Page': ['0-n',':'] },
+        'Link' : { 'Page': ['1','PointsTo'] },
+        'Website' : {  }
+    };
+
+    var extend = {
+
+        'Page': ['Named'],
+        'Content': ['Named'],
+        'Person': ['Named'],
+        'Link': ['Named'],
+        'Website': ['Named']
+    };
+
+    var attributes = {
+        'Named' : [ ['name', 'EString', '0-1'] ],
+        'Page' : [ ['name', 'EString', '0-1'] ],
+        'Content' : [ ['name', 'EString', '0-1'], ['text', 'EString', '1'] ],
+        'Person' : [ ['name', 'EString', '0-1'] ],
+        'Link' : [ ['name', 'EString', '0-1'], ['URL', 'EString', '1'] ],
+        'Website' : [ ['name', 'EString', '0-1'] ]
+    };
+
+    var packages = {
+        'WebApplication' : [ 'Named', 'Page', 'Content', 'Person', 'Link', 'Website' ]
+    };
+
+    var eenums = {
+
+    };
+
+    var entityDict = { "fill":"yellow", "stroke":"orange", "stroke-width":" 1" };
+    var shape = "roundedrectangle";
+    var linkDict = { "stroke":"black", "stroke-width":"2" };
+    var labelDict = { "fontSize": "20px", "color": "black" };
+
+    // Style for user
+    var entityDict_user = { "fill":" #fff", "stroke":" #000", "stroke-width":"0.5" };
+    var shape_user = "roundedrectangle";
+    var linkDict_user = { "stroke":"#000000", "stroke-width":"0.5" };
+    var labelDict_user = { "fontSize": "16px", "color": "#000" };
+
+
+    var arrows = {'extend':extend, 'relatesTo':relatesTo, 'setof':setof};
+
+    var cells = buildGraphFromAdjacencyList(adjacencyList, arrows, attributes, "roundedrectangle");
+    graph.resetCells(cells);
+
+    joint.layout.DirectedGraph.layout(graph, { setLinkVertices: false });
+
+    jQuery.each(eenums, function(label, val) {
+        graph.addCell(makeEEnum(label, "roundedrectangle"));
+    });
+
+</script>
+</body>
+</html>

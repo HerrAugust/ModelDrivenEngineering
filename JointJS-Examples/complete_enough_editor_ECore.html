@@ -3,18 +3,18 @@
 <head>
     <meta charset="ISO-8859-1"/>
     <!-- @author github.com/HerrAugust -->
-    <link rel="stylesheet" href="./joint-master/joint.css" />
+    <link rel="stylesheet" href="joint-master/custom/css/normalize.css" />
+    <link rel="stylesheet" href="joint-master/joint.css" />
     <link rel="stylesheet" href="joint-master/custom/css/all.css"/>
 
-    <script src="./joint-master/jquery.js"></script>
-    <script src="./joint-master/index.js"></script>
-    <script src="./joint-master/backbone.js"></script>
-    <script src="./joint-master/joint.js"></script>
+    <script src="joint-master/jquery.js"></script>
+    <script src="joint-master/index.js"></script>
+    <script src="joint-master/backbone.js"></script>
+    <script src="joint-master/joint.js"></script>
 
     <script src="joint-master/joint.layout.DirectedGraph.js"></script>
     <script src="joint-master/graphlib.min.js"></script>
     <script src="joint-master/dagre.min.js"></script>
-
 
 </head>
 <body>
@@ -116,33 +116,6 @@
             </figure>
         </div>-->
     </div>
-
-    <div id="properties">
-        <div class="header">
-            Properties
-        </div>
-        <div class="properties general">
-
-        </div>
-        <div class="properties EPackage">
-
-        </div>
-        <div class="properties EClass">
-
-        </div>
-        <div class="properties EReference">
-
-        </div>
-        <div class="properties EDataType">
-
-        </div>
-        <div class="properties ESuperType">
-
-        </div>
-        <div class="properties EEnum">
-
-        </div>
-    </div>
 </aside>
 
 <div id="paper"></div>
@@ -151,7 +124,9 @@
     Ecore diagrams editor
 </footer>
 
+<script type="text/javascript" src="joint-master/custom/aside_management.js"></script>
 <script type="text/javascript" src="joint-master/custom/shapes/utility.js"></script>
+
 <script type="text/javascript" src="joint-master/custom/shapes/RoundedRectangle.js"></script>
 <script type="text/javascript" src="joint-master/custom/shapes/rectangle.js"></script>
 <script type="text/javascript" src="joint-master/custom/shapes/ellipse.js"></script>
@@ -169,44 +144,13 @@
     //Needed when dragging a rectangle (box)
     var startX, startY, startWidth, startHeight;
 
-    /* BEGIN Non JointJS functionalities */
-    $('.figure-container').click(function(e) {
-        $('.figure-container').each(function(e) {
-            $(this).removeClass('figure-container-clicked');
-        });
-        var figcap = $(this).first().find('figcaption').text();
-        var newelem;
-        if(figcap == 'Association' || figcap == 'EReference' || figcap == 'Aggregation' || figcap == 'ESuperType') {
-            $(this).addClass('figure-container-clicked');
-        }
-        else { //Rectangles clicked
-            // Create a new object and position it on a standard position
-            switch(figcap) {
-                case 'Circle':
-                    newelem = new joint.shapes.html.circle.Circle();
-                    break;
-                case 'Ellipse':
-                    newelem = new joint.shapes.html.ellipse.Ellipse();
-                    break;
-                case 'Rectangle':
-                    newelem = new joint.shapes.html.rectangle.Rectangle();
-                    break;
-                /*case 'Diamond':
-                    newelem = new joint.shapes.html.diamond.Diamond();
-                    break;*/
-            }
-            graph.addCell(newelem);
-        }
-    });
-    /* END Non JointJS functionalities */
-
     function buildGraphFromAdjacencyList(adjacencyList, arrows, attributes) {
 
         var elements = [];
         var links = [];
 
         _.each(adjacencyList, function(edges, parentElementLabel) {
-            elements.push(makeElement(parentElementLabel, attributes));
+            elements.push(makeElement(parentElementLabel));
 
             _.each(edges, function(childElementLabel) {
                 links.push(makeLink(parentElementLabel, childElementLabel, arrows));
@@ -228,10 +172,12 @@
         // elements must be in the graph already.
         return elements.concat(links);
     }
-    function makeLink(parentElementLabel, childElementLabel, arrows) {
+    function makeLink(parentElementLabel, childElementLabel, arrows, typology = '') {
         // First, determine the type of relation between the two element to connect
         var attr = {}; //bidirectional relation between parent and child, which is correctly the default relation
         var type = linkType(parentElementLabel, childElementLabel, arrows);
+        if(type === null)
+            type = typology;
         var labels = [];
         //console.log("parent:" + parentElementLabel + "; child: " + childElementLabel + "; type: "+type);
         if(type == 'extend') {
@@ -260,7 +206,7 @@
             source: { id: parentElementLabel },
             target: { id: childElementLabel },
             attrs: attr,
-            // You can choose the one you want from http://resources.jointjs.com/demos/routing
+            // You can choose the one that you want from http://resources.jointjs.com/demos/routing
             router: { name: 'orthogonal' },
             connector: { name: 'normal' },
             smooth: true
@@ -279,7 +225,7 @@
         return link;
 
     }
-    function makeElement(label, attributes) {
+    function makeElement(label) {
         var maxLineLength = _.max(label.split('\n'), function(l) { return l.length; }).length;
 
         // Compute width/height of the rectangle based on the number
@@ -338,6 +284,16 @@
     graph.on('add remove change:source change:target', myAdjustVertices);
     // also when an user stops interacting with an element.
     paper.on('cell:pointerup', myAdjustVertices);
+    // when you click where there is no link or cell, just hide cell's buttons
+    paper.on('blank:pointerclick', function(evt, x, y) {
+        $('.move').each(function() {
+            $(this).css('visibility', 'hidden');
+        });
+        $('.delete').each(function() {
+            $(this).css('visibility', 'hidden')
+        });
+    });
+    paper.on('cell:pointerclick', aside_linkCreation);
 
     var entities = ['Page', 'Named', 'Content', 'Link', 'Person'];
 
@@ -388,6 +344,7 @@
     graph.resetCells(cells);
 
     joint.layout.DirectedGraph.layout(graph, { setLinkVertices: false });
+
 </script>
 </body>
 </html>

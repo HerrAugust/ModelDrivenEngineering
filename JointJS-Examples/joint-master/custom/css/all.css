@@ -1,38 +1,17 @@
-/* Figures */
-figure {
-    display: block;
-    margin: 15px; /* adjust as needed */
-    width: 16px;
-    height: 16px;
-    position: relative;
-}
-figure img {
-    vertical-align: top;
-}
-figure figcaption {
-    position: absolute;
-    margin-left: 30px;
-    bottom: 0;
-}
-
 /* Header */
 header {
     width: 100%;
-    background: #4f4f4f;
+    background-color: #333;
     height: 40px;
-    top: 0;
-    right: 0;
-    left: 0;
-    position: absolute;
 }
 
+/* Menu */
 ul {
     font-family: "Helvetica Neue Light", "Lucida Grande", "Calibri", "Arial", sans-serif;
    list-style-type: none;
    margin: 0;
    padding: 0;
    overflow: hidden;
-   background-color: #333;
 }
 
 li {
@@ -43,12 +22,12 @@ li a, .dropbtn {
     display: inline-block;
     color: white;
     text-align: center;
-    padding: 14px 16px;
+    padding: 10px 16px;
     text-decoration: none;
 }
 
 li a:hover, .dropdown:hover .dropbtn {
-    background-color: red;
+    background-color: #3FAAE2;
 }
 
 li.dropdown {
@@ -72,71 +51,87 @@ li.dropdown {
     text-align: left;
 }
 
+.dropdown-content a.active {
+    background-color: lightblue;
+}
+
 .dropdown-content a:hover {background-color: #f1f1f1}
 
 .dropdown:hover .dropdown-content {
     display: block;
 }
 
+/* File input */
+#div_file {
+    width: 20%;
+    margin: auto;
+    background-color: #3FAAE2;
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+}
+
+#div_file input {
+    display: block;
+}
+
 /* Aside */
 aside #figures {
+    text-transform: uppercase;
+    color: white;
     width: 180px;
     position: absolute;
-    background: #dddddd;
+    background: #3FAAE2;
     bottom: 0;
     top: 0;
-    margin-left: 150px;
-    margin-top: 49px;
+    margin-left: -10px;
+    margin-top: 40px;
     border: 1px solid grey;
+}
+
+aside .figure-container {
+    padding-top: 3px;
+    padding-top: 3px
 }
 
 aside .figure-container:hover {
-    background: white;
+    background: black;
     width: 80%;
     margin: auto;
-    border-radius: 5px;
+    padding: 3px
 }
 
 aside .figure-container-clicked {
-    background: white;
+    background: blue;
     width: 80%;
     margin: auto;
     border-radius: 5px;
 }
 
-aside #properties .header {
-    width: 160px;
-    height: 30px;
-    background: #dddddd;
-    margin-top: 49px;
-    margin-left: -10px;
-    text-align: center;
-    border: 1px solid grey;
+figure {
+    display: block;
+    margin: 15px; /* adjust as needed */
+    width: 16px;
+    height: 16px;
+    position: relative;
 }
-
-/* Footer */
-footer {
-    z-index: 10;
-    height: 30px;
-    position: fixed;
+figure img {
+    vertical-align: top;
+}
+figure figcaption {
+    position: absolute;
+    margin-left: 30px;
     bottom: 0;
-    left: 0;
-    right: 0;
-    color: #ffffff;
-    background: #4f4f4f;
-    text-align: center;
-    margin-top: 5px;
-    font-family: "Helvetica Neue Light", "Lucida Grande", "Calibri", "Arial", sans-serif;
 }
 
-/* content */
+/* Content */
 #paper {
-    margin-left: 345px;
+    margin-top: 15px;
+    margin-left: 200px;
 }
 
-/* Arrows */
-/* empty rhombus */
-.setof {
+/* Content: Arrows */
+.setof { /* empty rhombus */
     d: 'M 30 0 L 60 30 30 60 0 30 z';
     fill: #fff;
 }
@@ -148,7 +143,7 @@ footer {
     fill: #fff;
 }
 
-/* Needed for customized elements */
+/* Content: Needed for customized elements */
 #paper-html-elements {
     position: relative;
     display: inline-block;
@@ -180,6 +175,7 @@ footer {
     width: 90%;
     text-align: center;
     background: transparent;
+    z-index: 2;
 }
 .html-element textarea {
     /* Enable interacting with inputs only. */
@@ -194,6 +190,15 @@ footer {
     border-color: transparent;
     resize: none;
     background: transparent;
+    z-index: 2;
+}
+.html-element label {
+    display: block;
+    text-align: center;
+    line-height: 150%;
+    font-size: .85em;
+    font-family: "Helvetica Neue Light", "Lucida Grande", "Calibri", "Arial", sans-serif;
+
 }
 label.small {
     font-size: 9px;
@@ -215,7 +220,36 @@ text tspan {
     height: 5px;
     position: absolute;
     cursor: nw-resize;
-    bottom: -2px;
+    bottom: -6px;
     right: -2px;
     visibility: hidden;
+}
+.delete {
+    /* Enable interacting with inputs only. */
+    pointer-events: auto;
+
+    background-color: transparent;
+    width: 5px;
+    height: 5px;
+    position: absolute;
+    bottom: -8px;
+    right: 0px;
+    visibility: hidden;
+    color: red;
+    cursor: pointer;
+}
+
+/* Footer */
+footer {
+    z-index: 10;
+    height: 30px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: #ffffff;
+    background: #4f4f4f;
+    text-align: center;
+    margin-top: 5px;
+    font-family: "Helvetica Neue Light", "Lucida Grande", "Calibri", "Arial", sans-serif;
 }
