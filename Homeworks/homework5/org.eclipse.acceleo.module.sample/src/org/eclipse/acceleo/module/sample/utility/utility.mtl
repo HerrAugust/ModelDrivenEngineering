@@ -1,0 +1,29 @@
+[comment encoding = Cp1252 /]
+[module utility('http://www.eclipse.org/acceleo/mtl/3.0', 'http://www.eclipse.org/emf/2002/Ecore')/]
+
+[query public getRootEPackage(currentpkg : EPackage) : ecore::EPackage = 
+	invoke('org.eclipse.acceleo.module.sample.utility.Utility', 'getRootEPackage(org.eclipse.emf.ecore.EPackage)', Sequence{currentpkg})
+/]
+[query public getAllSubpackages(pkg : EPackage) : Sequence(ecore::EPackage) = 
+	invoke('org.eclipse.acceleo.module.sample.utility.Utility', 'getAllSubpackages(org.eclipse.emf.ecore.EPackage)', Sequence{pkg})
+/]
+[query public getAllPackages(pkg : EPackage) : Sequence(ecore::EPackage) = 
+	invoke('org.eclipse.acceleo.module.sample.utility.Utility', 'getAllPackages(org.eclipse.emf.ecore.EPackage)', Sequence{pkg})
+/]
+[query public getAllClassesInsideEPackage(p : EPackage) : Sequence(ecore::EClass) = 
+	invoke('org.eclipse.acceleo.module.sample.utility.Utility', 'getAllClassesInsideEPackage(org.eclipse.emf.ecore.EPackage)', Sequence{p})
+/]
+[query public getAllEEnumsInsidePackage(p : EPackage) : Sequence(ecore::EEnum) = 
+	invoke('org.eclipse.acceleo.module.sample.utility.Utility', 'getAllEEnumsInsidePackage(org.eclipse.emf.ecore.EPackage)', Sequence{p})
+/]
+
+
+
+[comment tests operations /]
+[query public test(aClass : EClass) : String = 
+	invoke('org.eclipse.acceleo.module.sample.utility.Utility', 'test(org.eclipse.emf.ecore.EClass)', Sequence{aClass}) /]
+[query public div(arg0 : Real, arg1 : Real) : Real
+	= invoke('org.eclipse.acceleo.module.sample.utility.Utility', 'div(java.lang.Double, java.lang.Double)', Sequence{arg0, arg1}) /]
+[query public testlist(arg0 : String) : Sequence(String) =
+	invoke('org.eclipse.acceleo.module.sample.utility.Utility', 'testlist(java.lang.String)', Sequence{arg0})
+/]

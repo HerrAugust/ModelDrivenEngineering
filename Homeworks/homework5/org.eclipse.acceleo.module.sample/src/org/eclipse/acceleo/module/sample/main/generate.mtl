@@ -1,0 +1,49 @@
+[comment encoding = UTF-8 /]
+[module generate('http://www.eclipse.org/emf/2002/Ecore')/]
+
+[import org::eclipse::acceleo::module::sample::utility::utility /] [comment needed for using Utility.java/]
+
+[comment Algorithm:
+		1. find the root package by iterating over all parent packages of the entry point (a class)
+		2. Given rootpkg, for each entity ent in rootpkg:
+		3.		write the entity ent + its setOf + its relatesTo + its attributes
+		4.		for each package inside the entity ent, goto 2
+/]
+
+[template public generateElement(entrypnt : EPackage)]
+[comment @main/]
+[file ('intermediate_repr.txt', false, 'UTF-8')]
+@entityLabel(fontSize: 20px, color: black)
+@entityShape(fill: yellow, stroke: orange, stroke-width: 1, shape: roundedrectangle)
+
+@relation(stroke: black, stroke-width: 1)
+
+[comment foreach pck/][for(pck : EPackage | entrypnt.getAllPackages()) before('epackage ') separator('}\nepackage ') after('}\n')]
+[pck.name/] {
+	[for(inside : ecore::EClass | pck.getAllClassesInsideEPackage()) before('entities: ') separator(', ') after(';')][inside.name/][/for]
+	[for(eenum : ecore::EEnum | pck.getAllEEnumsInsidePackage()) before('enums: ') separator(', ') after(';')][eenum.name/][/for]
+[/for] [comment END foreach pck /]
+	
+[comment foreach entity/]
+
+
+[for(pck : ecore::EPackage | entrypnt.getAllPackages()) ]
+[for(inside : ecore::EClass | pck.getAllClassesInsideEPackage()) before('entity ') separator('entity ')]
+[inside.name/][for(ext : ecore::EClass | inside.eAllSuperTypes) before(' extends ') separator(', ')][ext.name/][/for]	{
+	[comment isSetOf line/][for(e : ecore::EReference | inside.eAllReferences->select(r | r.containment) ) before('isSetOf: ') separator(', ') after(';')][e.lowerBound/]-[if(e.upperBound = -1)]n [/if][if(e.upperBound <> -1)][e.upperBound/] [/if][e.name/] : [e.eType.name/][/for]
+	[comment relates line/][for(e : ecore::EReference | inside.eAllReferences->select(r | r.containment = false) ) before('relatesTo: ') separator(', ') after(';')][e.lowerBound/]-[if(e.upperBound = -1)]n [/if][if(e.upperBound <> -1)][e.upperBound/] [/if][e.name/] : [e.eType.name/][/for]
+	[comment attributes line/][for(e : ecore::EAttribute | inside.eAllAttributes ) before('attributes: ') separator(', ') after(';')][e.lowerBound/]-[if(e.upperBound = -1)]n[/if][if(e.upperBound <> -1)][e.upperBound/] [/if][e.name/] : [e.eType.name/][/for]
+}
+[/for]
+[/for] [comment END foreach entity/]
+
+[comment foreach eenum /]
+[for(pck : ecore::EPackage | entrypnt.getAllPackages()) ]
+[for(eenum : ecore::EEnum | pck.eClassifiers->select(c|c.oclIsTypeOf(ecore::EEnum))) before('eenum ') separator('}\neenum ') after('}\n')]
+[eenum.name/] {
+	[for(inside : ecore::EEnumLiteral | eenum.eLiterals) before('eliterals: ') separator(', ') after(';')][inside.name/][/for]
+[/for]
+[/for]
+[comment END foreach eenum/]
+[/file]
+[/template]

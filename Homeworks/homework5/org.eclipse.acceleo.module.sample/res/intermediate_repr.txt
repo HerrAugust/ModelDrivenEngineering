@@ -1,0 +1,43 @@
+@entityLabel(fontSize: 20px, color: black)
+@entityShape(fill: yellow, stroke: orange, stroke-width: 1, shape: roundedrectangle)
+
+@relation(stroke: black, stroke-width: 1)
+
+epackage WebApplication {
+	entities: Named, Page, Content, Person, Link, Website;
+	
+}
+	
+
+
+entity Named	{
+	
+	
+	attributes: 0-1 name : EString;
+}
+entity Page extends Named	{
+	isSetOf: 0-n links : Link, 1-n content : Content;
+	relatesTo: 1-1 belongs : Person;
+	attributes: 0-1 name : EString;
+}
+entity Content extends Named	{
+	
+	
+	attributes: 0-1 name : EString, 1-1 text : EString;
+}
+entity Person extends Named	{
+	
+	relatesTo: 0-n has : Page;
+	attributes: 0-1 name : EString;
+}
+entity Link extends Named	{
+	
+	relatesTo: 1-1 PointsTo : Page;
+	attributes: 0-1 name : EString, 1-1 URL : EString;
+}
+entity Website extends Named	{
+	isSetOf: 1-n pages : Page, 1-n people : Person;
+	
+	attributes: 0-1 name : EString;
+}
+
