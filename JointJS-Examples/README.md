@@ -7,6 +7,11 @@ This example of JointJS shows:
 
 ![demo JointJS](demo.JPG)
 
+## Trick
+Unfortunately, JointJS works with SVGs and their content (the content within them in this project) is done by HTML5. I do not think that there is an easy way to access from joint.dia.Element to its HTML template. The trick is the following one:
+1. Obtain its id, which is hidden in the SVG’s text in this way var id = elem.attr(‘text/text’);
+2. Obtain the desired element's HTML in this way $(‘#input_’+id).val() or $(‘#textarea_’+id).val(), for example
+
 # Thanks
 It is based on opensource material:
 * the official one (Joint JS tutorial) http://resources.jointjs.com/tutorial
